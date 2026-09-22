@@ -475,8 +475,22 @@ class Aichess():
         # Initialize the frontier with the initial state and its heuristic value 
         # You have to also implement the heuristic function h().
         frontier.append((self.h(currentState),currentState))
+        
+        
 
 	# your code here...
+    def h(self, currentState):
+#fijo la posicion target el rey negro
+        posicion_rey=[0,4]
+        #extraigo las pociosnes de las figuras porq pueden cambiar
+        torre_blanca=curentState[0]
+        rey_blancno=curentState[1]
+
+        #absoluto por si sale negativo
+        distancia_torre=abs(torre_blanca[0]-posicion_rey[0])+abs(torre_blanca[1]-posicion_rey[1])
+        distancia_rey=abs(rey_blancno[0]-posicion_rey[0])+abs(rey_blancno[1]-p*osicion_rey[1])
+        return distancia_torre+distancia_rey
+    
 
 
 if __name__ == "__main__":
