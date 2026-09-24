@@ -474,22 +474,97 @@ class Aichess():
         frontier = []
         # Initialize the frontier with the initial state and its heuristic value 
         # You have to also implement the heuristic function h().
+        
+        #dic de costtes para gestionar mejor
+        costes = {}
         frontier.append((self.h(currentState),currentState))
-        
-        
 
+        #primer paso,mel inicio
+        self.dictPath[str(currentState)] = (None, -1)
+        costes[str(currentState)] = 0
+
+
+        while frontier:
+            #a falta de heap ordenar por el peso actual
+            frontier.sort(key=lambda item: item[0])
+            # Sacar el nodo con el menor peso
+            peso, state = frontier.pop(0)
+
+            if self.isVisited(state):
+                continue
+
+            #sacamos el path del menor
+            estado , camino = self.dictPath[str(state)]
+            #sumamos 1 al camiono avanzamos de uno  en uno
+            recorrido= camino + 1   
+        
+            #hacemos los movimientops
+            if estado is not None:
+                #printeo del tablero para poder aprecair el abvacnbe (pa comprobar si fuciona)
+                print("Movimiento número:", recorrido)
+                self.movePieces(estado,camino,state,recorrido)
+                
+                print("Estado:", state)
+                self.chess.boardSim.print_board()
+            #comprobamos si es jaque mate
+            if self.isCheckMate(state):
+                #si lñlegmao reconstruimos como en los ejemplos
+                self.reconstructPath(state, recorrido)
+                return
+
+            #guardamos como visto
+            self.listVisitedStates.append(state)
+
+            #saco los siguientes movimientos
+            movimientos= self.getListNextStatesW(state)
+
+            for mov in movimientos:
+                #scamos posibles movimentos copaidno pano alterar si equivoamos
+                movimiento = self.copyState(mov)
+
+                #string porq sino no funciona
+                movimientoKey = str(movimiento)
+                #seguimos avanzando el coste es actual mas 1
+                nuevoCoste = recorrido + 1
+                #si el costo es menor al que ya tenemos
+                #inf pa q funcione,
+                if nuevoCoste < costes.get(movimientoKey, math.inf):
+
+                    costes[movimientoKey] = nuevoCoste
+                    #enlazamos path
+                    self.dictPath[movimientoKey] = (state,recorrido)
+                    #scamos el coste, coste +h
+                    pesoMovimiento = (nuevoCoste + self.h(movimiento))
+                    #añadimos al frontier pa avanzqar
+                    frontier.append((pesoMovimiento,movimiento))
 	# your code here...
     def h(self, currentState):
-#fijo la posicion target el rey negro
-        posicion_rey=[0,4]
-        #extraigo las pociosnes de las figuras porq pueden cambiar
-        torre_blanca=curentState[0]
-        rey_blancno=curentState[1]
+#fijo la posicion target el rey y torre  blanco q es la misma en la lista
+        posicion_rey=[2,4]
+        posicion_torre= [[0, 0],[0, 1],[0, 2],[0, 6],[0, 7]]
 
-        #absoluto por si sale negativo
-        distancia_torre=abs(torre_blanca[0]-posicion_rey[0])+abs(torre_blanca[1]-posicion_rey[1])
-        distancia_rey=abs(rey_blancno[0]-posicion_rey[0])+abs(rey_blancno[1]-p*osicion_rey[1])
-        return distancia_torre+distancia_rey
+        #extraigo las pociosnes de las figuras porq pueden cambiar
+        torre_blanca=self.getPieceState(currentState, 2)
+        rey_blancno=self.getPieceState(currentState, 6)
+
+        #absoluto por si sale negativo, metodo basado en movimeintos
+        distancia_rey=abs(rey_blancno[0]-posicion_rey[0])+abs(rey_blancno[1]-posicion_rey[1])
+
+
+        distancia_torre = []
+
+        #como la TORRE se mueve mucho, maximo seran 2 movimientos
+        for torre in posicion_torre:
+            if torre_blanca[0:2] ==torre:
+                dis = 0
+            elif (torre_blanca[0] == torre[0] or torre_blanca[1] == torre[1]):
+                dis = 1
+            else:
+                dis = 2
+
+        distancia_torre.append(dis)
+
+        return min(distancia_torre)+distancia_rey
     
 
 
