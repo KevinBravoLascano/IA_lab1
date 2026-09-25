@@ -561,8 +561,7 @@ class Aichess():
                 dis = 1
             else:
                 dis = 2
-
-        distancia_torre.append(dis)
+            distancia_torre.append(dis)
 
         return min(distancia_torre)+distancia_rey
     
