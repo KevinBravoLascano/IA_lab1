@@ -483,7 +483,7 @@ class Aichess():
         self.dictPath[str(currentState)] = (None, -1)
         costes[str(currentState)] = 0
 
-
+        print("heurastica minima calculada:",self.h(currentState))
         while frontier:
             #a falta de heap ordenar por el peso actual
             frontier.sort(key=lambda item: item[0])
