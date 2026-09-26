@@ -112,7 +112,7 @@ class Aichess():
         self.listVisitedStates = []
         self.listVisitedSituations = []
         self.pathToTarget = []
-        self.depthMax = 8;
+        self.depthMax = 10;
         # Dictionary to reconstruct the visited path
         self.dictPath = {}
         # Prepare a dictionary to control the visited state and at which
@@ -485,6 +485,7 @@ class Aichess():
 
         print("heurastica minima calculada:",self.h(currentState))
         while frontier:
+            
             #a falta de heap ordenar por el peso actual
             frontier.sort(key=lambda item: item[0])
             # Sacar el nodo con el menor peso
@@ -500,13 +501,15 @@ class Aichess():
         
             #hacemos los movimientops
             if estado is not None:
-                #printeo del tablero para poder aprecair el abvacnbe (pa comprobar si fuciona)
-                print("Movimiento número:", recorrido)
+              
                 self.movePieces(estado,camino,state,recorrido)
                 
-                print("Estado:", state)
-                self.chess.boardSim.print_board()
+                
+            
             #comprobamos si es jaque mate
+            print("STATE COMPROBADO:", state)
+            print("JAQUE MATE:", self.isCheckMate(state))
+
             if self.isCheckMate(state):
                 #si lñlegmao reconstruimos como en los ejemplos
                 self.reconstructPath(state, recorrido)
@@ -546,7 +549,8 @@ class Aichess():
         #extraigo las pociosnes de las figuras porq pueden cambiar
         torre_blanca=self.getPieceState(currentState, 2)
         rey_blancno=self.getPieceState(currentState, 6)
-
+        if rey_blancno is None or torre_blanca is None:
+            return float('inf')
         #absoluto por si sale negativo, metodo basado en movimeintos
         distancia_rey=abs(rey_blancno[0]-posicion_rey[0])+abs(rey_blancno[1]-posicion_rey[1])
 
