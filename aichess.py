@@ -480,7 +480,7 @@ class Aichess():
         frontier.append((self.h(currentState),currentState))
 
         #primer paso,mel inicio
-        self.dictPath[str(currentState)] = (None, -1)
+        self.dictPath[str(currentState)] = (None, 0)
         costes[str(currentState)] = 0
 
         print("heurastica minima calculada:",self.h(currentState))
@@ -495,24 +495,23 @@ class Aichess():
                 continue
 
             #sacamos el path del menor
-            estado , camino = self.dictPath[str(state)]
-            #sumamos 1 al camiono avanzamos de uno  en uno
-            recorrido= camino + 1   
-        
-            #hacemos los movimientops
-            if estado is not None:
-              
-                self.movePieces(estado,camino,state,recorrido)
-                
+            coste_actual = costes[str(state)]
+            #hacemos los movimientos
+            self.newBoardSim(self.copyState(state) + [[0, 4, 12]])  
                 
             
             #comprobamos si es jaque mate
-            print("STATE COMPROBADO:", state)
-            print("JAQUE MATE:", self.isCheckMate(state))
-
+        
+            #print("TABLERO DESPUES DEL MOVIMIENTO:")
+            #self.chess.boardSim.print_board()
+            print(state)
+            self.chess.boardSim.print_board()
             if self.isCheckMate(state):
                 #si lñlegmao reconstruimos como en los ejemplos
-                self.reconstructPath(state, recorrido)
+                self.reconstructPath(state, coste_actual)
+                #elimino el primer elmeento porq me sale None por como hice los cambios
+                self.pathToTarget.pop(0)
+              
                 return
 
             #guardamos como visto
@@ -524,18 +523,22 @@ class Aichess():
             for mov in movimientos:
                 #scamos posibles movimentos copaidno pano alterar si equivoamos
                 movimiento = self.copyState(mov)
+                if self.getPieceState(movimiento, 6) is None:
+                    continue
 
+                if movimiento[0][0:2] == [0,4]:
+                    continue
                 #string porq sino no funciona
                 movimientoKey = str(movimiento)
                 #seguimos avanzando el coste es actual mas 1
-                nuevoCoste = recorrido + 1
+                nuevoCoste = coste_actual + 1
                 #si el costo es menor al que ya tenemos
                 #inf pa q funcione,
                 if nuevoCoste < costes.get(movimientoKey, math.inf):
 
                     costes[movimientoKey] = nuevoCoste
                     #enlazamos path
-                    self.dictPath[movimientoKey] = (state,recorrido)
+                    self.dictPath[movimientoKey] = (state,nuevoCoste)
                     #scamos el coste, coste +h
                     pesoMovimiento = (nuevoCoste + self.h(movimiento))
                     #añadimos al frontier pa avanzqar
@@ -581,7 +584,7 @@ if __name__ == "__main__":
     # Load initial positions of the pieces
     # White pieces
     TA[7][0] = 2  
-    TA[7][4] = 6
+    TA[7][7] = 6
     # Black king   
     TA[0][4] = 12  
 
@@ -602,4 +605,5 @@ if __name__ == "__main__":
     print("#A* move sequence:", aichess.pathToTarget)
     print("A* End\n")
     print("Printing final board after A*:")
+    aichess.chess.boardSim.print_board()
 
